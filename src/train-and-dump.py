@@ -4,7 +4,7 @@ from sklearn.preprocessing import LabelEncoder
 import joblib
 from scipy.stats import randint, uniform
 from xgboost import XGBClassifier
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import RandomizedSearchCV
 import boto3
 
 # loading dataset, training and dumping models
@@ -23,7 +23,6 @@ for column in categorical_features:
 
 X = df.iloc[:, :-1]
 y = df.iloc[:,-1]
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 param_grid_xgb = {
     'n_estimators': randint(100, 500),      
@@ -37,12 +36,12 @@ param_grid_xgb = {
 }
 
 random_search = RandomizedSearchCV(XGBClassifier(random_state=42), param_grid_xgb, n_iter=20, cv=8, scoring='accuracy', n_jobs=-1)
-random_search.fit(X_train, y_train)
+random_search.fit(X, y)
 print("Best Parameters:", random_search.best_params_)
 print("Best Score:", random_search.best_score_)
 
 final_model = XGBClassifier(**random_search.best_params_, random_state=42)
-final_model.fit(X_train, y_train)
+final_model.fit(X, y)
 
 joblib.dump(final_model, "models/churn_prediction_model.pkl")
 joblib.dump(encoders, 'models/encoders.pkl')
