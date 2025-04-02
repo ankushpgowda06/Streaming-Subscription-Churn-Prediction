@@ -53,8 +53,6 @@ with st.form("user_input_form"):
 
     submit_button = st.form_submit_button("Predict Churn")
 
-
-
 if submit_button:
     encoded_inputs = {
         'age': age,
